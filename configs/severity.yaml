@@ -1,0 +1,25 @@
+# Severity / health / action rules (src/severity/severity.py)
+# S_i = clip(w_type * f(area_ratio) * w_location * confidence, 0, 1),  f(a) = 1 - exp(-k * a)
+# Health = 100 * prod_i (1 - S_i)  in [0, 100]   (replaces "100 - sum(S)", which can go negative)
+# All weights are ENGINEERING ASSUMPTIONS for the proxy setting, not values validated by maintainers.
+k: 20.0          # f(0.01)=0.18, f(0.05)=0.63, f(0.10)=0.86, f(0.20)=0.98
+w_type:
+  crack: 1.0
+  damage: 1.0
+  corrosion: 0.8
+  oil_leak: 0.7
+  surface_wear: 0.5
+w_location:
+  default: 1.0
+  critical: 1.5   # used when a critical-zone mask is given: w = default + (critical - default) * overlap_fraction
+actions:          # first rule whose min_health <= Health applies (checked top to bottom)
+  - {min_health: 80, action: Routine Monitoring}
+  - {min_health: 50, action: Schedule Maintenance}
+  - {min_health: 20, action: Urgent Intervention}
+  - {min_health: 0, action: Critical/Withdraw}
+alert_below: 50
+rul_failure_threshold: 20
+inference:
+  weights: runs/segment/yolo11s-seg/weights/best.pt   # dashboard default; editable in the sidebar
+  conf: 0.25
+  imgsz: 640

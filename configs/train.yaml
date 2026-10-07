@@ -1,0 +1,34 @@
+# Training config for scripts/train.py (Ultralytics YOLO segmentation). GPU strongly recommended.
+seed: 42
+data: data/processed/data.yaml
+imgsz: 640
+epochs: 60
+patience: 15
+batch: 16            # -1 = Ultralytics auto-batch (60% GPU memory); actual value is logged
+workers: 4
+deterministic: true
+optimizer: auto
+cos_lr: false
+project: runs/segment
+smoke: {n_train: 50, n_val: 20, epochs: 1, batch: 8}
+
+# Standard Ultralytics augmentation (defaults written out so they are logged) + extra rotation/brightness.
+augment:
+  hsv_h: 0.015
+  hsv_s: 0.7
+  hsv_v: 0.5         # default 0.4 -> 0.5: stronger brightness jitter
+  degrees: 15.0      # default 0.0 -> +-15 deg extra rotation
+  translate: 0.1
+  scale: 0.5
+  shear: 0.0
+  perspective: 0.0
+  flipud: 0.5        # defects have no canonical "up" (default 0.0)
+  fliplr: 0.5
+  mosaic: 1.0
+  mixup: 0.0
+  copy_paste: 0.0
+  close_mosaic: 10
+
+# Extra pixel-only brightness/contrast jitter (src/vision/yolo_aug.py): img*alpha + beta,
+# alpha ~ U(1-contrast, 1+contrast), beta ~ U(-brightness, +brightness)*255, applied with probability p.
+brightness_contrast: {p: 0.5, brightness: 0.15, contrast: 0.25}

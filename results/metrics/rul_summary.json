@@ -1,0 +1,92 @@
+{
+  "synthetic": true,
+  "n_equipment": 30,
+  "n_inspections": 309,
+  "n_overhauls": 11,
+  "n_defects_observed": 695,
+  "equipment_failing_within_horizon_plus_extra": 30,
+  "median_true_failure_day": 574.0,
+  "rul_eval_points_total": 187,
+  "rul_eval_points_censored": 0,
+  "methods": {
+    "linear": {
+      "n_eval_points": 187,
+      "n_equipment": 30,
+      "MAE_days": 807.5878539298091,
+      "median_AE_days": 815.159003896327,
+      "RMSE_days": 947.6879598336335,
+      "share_pred_capped": 0.37967914438502676,
+      "MAE_days_incl_censored_capped": 807.5878539298091
+    },
+    "exponential": {
+      "n_eval_points": 187,
+      "n_equipment": 30,
+      "MAE_days": 295.49856394954855,
+      "median_AE_days": 77.46551373233206,
+      "RMSE_days": 534.7042617402655,
+      "share_pred_capped": 0.15508021390374332,
+      "MAE_days_incl_censored_capped": 295.49856394954855
+    }
+  },
+  "config": {
+    "seed": 42,
+    "start_date": "2024-01-01",
+    "n_equipment": 30,
+    "n_inspections": [
+      8,
+      12
+    ],
+    "first_inspection_day": [
+      0,
+      30
+    ],
+    "inspection_interval_days": {
+      "mean": 55,
+      "jitter": 8
+    },
+    "horizon_days": 728,
+    "gt_extra_days": 1825,
+    "defect_process": {
+      "emergence_rate_per_day": 0.008,
+      "class_probs": {
+        "crack": 0.2,
+        "corrosion": 0.3,
+        "oil_leak": 0.15,
+        "surface_wear": 0.25,
+        "damage": 0.1
+      },
+      "initial_area": {
+        "median": 0.002,
+        "log_sigma": 0.6
+      },
+      "growth_drift_per_day": {
+        "crack": 0.0085,
+        "corrosion": 0.0065,
+        "oil_leak": 0.007,
+        "surface_wear": 0.0045,
+        "damage": 0.003
+      },
+      "growth_volatility": 0.02,
+      "frailty_log_sigma": 0.3,
+      "max_area_ratio": 0.6
+    },
+    "observation": {
+      "detection_min_area": 0.0005,
+      "area_noise_log_sigma": 0.15,
+      "confidence_beta": [
+        18,
+        2
+      ]
+    },
+    "overhaul": {
+      "enabled": true,
+      "observed_health_below": 20
+    },
+    "rul": {
+      "failure_threshold": 20,
+      "min_inspections_for_fit": 4,
+      "cap_days": 1825,
+      "n_sample_curves": 6
+    }
+  }
+}

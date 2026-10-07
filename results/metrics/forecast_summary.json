@@ -1,0 +1,105 @@
+{
+  "synthetic": true,
+  "coupling_by_construction": true,
+  "models_run": [
+    "naive",
+    "croston",
+    "sba"
+  ],
+  "models_skipped": {
+    "sarima": "statsmodels not installed",
+    "sarimax_sev": "statsmodels not installed",
+    "prophet": "prophet not installed",
+    "lgbm": "lightgbm not installed",
+    "lgbm_sev": "lightgbm not installed"
+  },
+  "n_replicates": 3,
+  "test_weeks": 20,
+  "summary": [
+    {
+      "level": "zero",
+      "model": "sba",
+      "MAE": 1.8770085101088334,
+      "RMSE": 2.313781340762962,
+      "MASE": 0.8746116314204355
+    },
+    {
+      "level": "zero",
+      "model": "croston",
+      "MAE": 1.9137780291410635,
+      "RMSE": 2.331359366189998,
+      "MASE": 0.8909277960004385
+    },
+    {
+      "level": "zero",
+      "model": "naive",
+      "MAE": 2.2472222222222222,
+      "RMSE": 3.235353124003598,
+      "MASE": 1.0061015674310763
+    },
+    {
+      "level": "low",
+      "model": "sba",
+      "MAE": 2.5977901709792524,
+      "RMSE": 3.2232966424589056,
+      "MASE": 1.0389993237909096
+    },
+    {
+      "level": "low",
+      "model": "croston",
+      "MAE": 2.6413158137132715,
+      "RMSE": 3.2405435996242495,
+      "MASE": 1.0554020825391128
+    },
+    {
+      "level": "low",
+      "model": "naive",
+      "MAE": 3.1805555555555554,
+      "RMSE": 4.501969170818557,
+      "MASE": 1.2312799840996171
+    },
+    {
+      "level": "medium",
+      "model": "sba",
+      "MAE": 4.061887356613148,
+      "RMSE": 5.08831851913199,
+      "MASE": 1.2397539122991799
+    },
+    {
+      "level": "medium",
+      "model": "croston",
+      "MAE": 4.124793708715595,
+      "RMSE": 5.104527203031943,
+      "MASE": 1.2582689725878293
+    },
+    {
+      "level": "medium",
+      "model": "naive",
+      "MAE": 5.033333333333333,
+      "RMSE": 7.072807269539871,
+      "MASE": 1.4964713151130955
+    },
+    {
+      "level": "high",
+      "model": "sba",
+      "MAE": 6.2129950215418805,
+      "RMSE": 7.822094851756262,
+      "MASE": 1.422483498690774
+    },
+    {
+      "level": "high",
+      "model": "croston",
+      "MAE": 6.2955183400921175,
+      "RMSE": 7.837007712610898,
+      "MASE": 1.441053132389231
+    },
+    {
+      "level": "high",
+      "model": "naive",
+      "MAE": 7.797222222222222,
+      "RMSE": 10.884471767170064,
+      "MASE": 1.7474819060230757
+    }
+  ],
+  "sensitivity": []
+}

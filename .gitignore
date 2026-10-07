@@ -1,0 +1,12 @@
+data/raw/
+data/processed/
+runs/
+*.pt
+__pycache__/
+.pytest_cache/
+
+.env
+.venv/
+venv/
+.streamlit/secrets.toml
+.ipynb_checkpoints/

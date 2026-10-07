@@ -1,0 +1,53 @@
+# Data conversion config for scripts/convert_to_yolo_seg.py
+# PROXY DATA: public civil / industrial / automotive defect datasets stand in for
+# (unavailable) defence-equipment imagery. Nothing here is real defence data.
+
+classes: [crack, corrosion, oil_leak, surface_wear, damage]   # YOLO ids 0..4 - never reorder after training
+raw_dir: data/raw
+out_dir: data/processed
+seed: 42
+split: {train: 0.70, val: 0.15, test: 0.15}   # applied per source (stratified by source)
+max_source_fraction: 0.40    # cap any single source at ~40% of kept images (relaxed to 1/n_sources if fewer than 3 sources)
+min_instance_area_px: 30     # polygons/components smaller than this are dropped as noise
+max_polygon_points: 200      # polygons are uniformly subsampled to at most this many vertices
+
+# Fallback when a raw class name is not in a source's class_map (substring match, case-insensitive).
+keyword_map:
+  crack: [crack, fissure, fracture]
+  corrosion: [corros, rust, oxid]
+  oil_leak: [oil, leak, spill, seep]
+  surface_wear: [wear, scratch, abras, pitt, scuff, erosion, scale, inclusion]
+  damage: [dent, damage, broken, shatter, deform, bent, hole, flat, missing, cut]
+
+# Per-source options. Key = folder name under data/raw/. Every field is optional:
+#   format:        auto | yolo_seg | coco | mask_png | severstal_rle   (auto-detected if omitted)
+#   class_map:     {raw_name_or_id: unified_class | null}   null = drop that class
+#   default_class: class used when neither class_map nor keyword_map matches (else the instance is dropped)
+#   mask_class:    for binary mask PNG sources, the class of every foreground pixel
+#   mask_values:   for multi-valued mask PNGs, {grey_value: class} (mask converted to 8-bit grey first)
+# Folders not listed here are still converted with format=auto and the keyword_map.
+sources:
+  severstal:            # Kaggle Severstal Steel Defect Detection (train.csv RLE + train_images/)
+    format: severstal_rle
+    # ClassIds 1-4 are unnamed by the organisers; all treated as surface defects. CHECK before reporting.
+    class_map: {"1": surface_wear, "2": surface_wear, "3": surface_wear, "4": surface_wear}
+  crack_seg:            # e.g. Ultralytics/Roboflow crack-seg (YOLO-seg)
+    default_class: crack
+  crack500:             # mask PNGs next to JPGs
+    format: mask_png
+    mask_class: crack
+  deepcrack:
+    format: mask_png
+    mask_class: crack
+  cardd:                # CarDD (COCO polygons)
+    class_map: {dent: damage, scratch: surface_wear, crack: crack, glass_shatter: damage,
+                "glass shatter": damage, lamp_broken: damage, "lamp broken": damage,
+                tire_flat: damage, "tire flat": damage}
+  mvtec_ad:             # MVTec AD: ground_truth/<defect>/xxx_mask.png; class from defect folder name
+    format: mask_png
+    class_map: {crack: crack, scratch: surface_wear, good: null}
+    default_class: damage
+  sdnet2018:            # classification only - no masks; kept here so the skip is explicit
+    format: skip
+  neu_det:              # bounding boxes only - not usable for segmentation
+    format: skip

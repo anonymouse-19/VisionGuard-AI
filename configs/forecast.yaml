@@ -1,0 +1,34 @@
+# A5 defect-driven spare-parts demand forecasting (scripts/run_forecasting.py)
+# SYNTHETIC DEMAND: the demand uplift is CAUSED BY CONSTRUCTION by lagged fleet severity from the A4
+# simulation. Any benefit of severity features here shows the method can exploit such a link if it
+# exists; it is NOT evidence that real spare-parts demand follows defect severity.
+seed: 42
+n_replicates: 3                 # independent demand realisations per coupling level (common random numbers across levels)
+fleet_severity_csv: results/simulation/fleet_severity_weekly.csv
+n_weeks: 104
+test_weeks: 20                  # last 20 weeks; rolling-origin one-step-ahead forecasts
+coupling_lags: {2: 0.3, 3: 0.4, 4: 0.3}          # uplift weights on severity lagged 2-4 weeks
+coupling_levels: {zero: 0.0, low: 0.25, medium: 0.75, high: 1.5}   # gamma: uplift = gamma * base * lagged normalised severity
+
+# mu_t = base * (1 + season_amp * sin(2 pi (t + season_phase) / 52)) + gamma * base * sev_lagged_t
+# y_t  = Bernoulli(p_occurrence) * NegBin(mean = mu_t / p_occurrence, dispersion r)  -> E[y_t] = mu_t
+skus:
+  - {sku: SKU-CRK, part: weld_repair_kit,    defect_class: crack,        base: 1.0, season_amp: 0.20, season_phase: 0,  p_occurrence: 0.45, nb_dispersion: 2.0}
+  - {sku: SKU-COR, part: casing_seal,        defect_class: corrosion,    base: 2.0, season_amp: 0.30, season_phase: 10, p_occurrence: 0.60, nb_dispersion: 2.0}
+  - {sku: SKU-OIL, part: hydraulic_seal_kit, defect_class: oil_leak,     base: 1.5, season_amp: 0.15, season_phase: 20, p_occurrence: 0.50, nb_dispersion: 2.0}
+  - {sku: SKU-WEA, part: bearing_liner,      defect_class: surface_wear, base: 2.5, season_amp: 0.25, season_phase: 30, p_occurrence: 0.70, nb_dispersion: 3.0}
+  - {sku: SKU-DMG, part: panel_assembly,     defect_class: damage,       base: 0.6, season_amp: 0.10, season_phase: 5,  p_occurrence: 0.30, nb_dispersion: 1.5}
+  - {sku: SKU-GEN, part: filter_element,     defect_class: all,          base: 3.0, season_amp: 0.30, season_phase: 40, p_occurrence: 0.80, nb_dispersion: 3.0}
+
+features:
+  demand_lags: [1, 2, 3, 4]
+  rolling_means: [4, 8]         # of demand, ending at t-1
+  severity_lags: [2, 3, 4]      # normalised fleet severity of the SKU's defect class (known at forecast time)
+
+models:
+  enabled: [naive, croston, sba, sarima, sarimax_sev, prophet, lgbm, lgbm_sev]
+  croston_alpha: 0.1
+  sarima: {order: [1, 0, 1], fourier_k: 1, period: 52}   # annual seasonality via Fourier terms: 84 training weeks < 2 seasonal cycles
+  prophet: {refit_every: 4, yearly_seasonality: 3}       # refit every 4 weeks, forecast the next 1-4 weeks
+  lightgbm: {n_estimators: 300, learning_rate: 0.05, num_leaves: 15, min_child_samples: 10, objective: poisson}
+plot_models: [sba, sarima, sarimax_sev, prophet, lgbm, lgbm_sev]

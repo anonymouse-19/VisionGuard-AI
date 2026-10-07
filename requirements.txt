@@ -1,0 +1,19 @@
+# VisionGuard AI - pinned dependencies.
+# [verified]   installed and exercised on the dev laptop (Windows 11, Python 3.13.2, CPU only).
+# [unverified] pinned to a released version but NOT installed/run on the dev laptop (no downloads allowed there).
+#              If pip cannot resolve one of these, pick the nearest release and log it in docs/ISSUES_LOG.md.
+numpy==2.5.1                  # verified
+pandas==2.2.3                 # verified
+scipy==1.17.1                 # verified
+matplotlib==3.10.8            # verified (contourpy comes with it; used for mask contours when OpenCV is absent)
+Pillow==12.0.0                # verified
+PyYAML==6.0.3                 # verified
+streamlit==1.51.0             # verified
+pytest==9.0.3                 # verified
+torch==2.11.0                 # verified on CPU; on a GPU box install the CUDA build of the same version from pytorch.org
+ultralytics==8.3.100          # unverified - YOLO11-seg training/eval (pulls torchvision, opencv-python)
+opencv-python-headless==4.10.0.84  # unverified - optional, faster contour extraction in the converter
+statsmodels==0.14.4           # unverified - SARIMA / SARIMAX
+prophet==1.1.6                # unverified
+lightgbm==4.5.0               # unverified
+pycocotools==2.0.8            # unverified - only needed for COCO sources with compressed RLE masks

@@ -1,0 +1,40 @@
+# A4 synthetic fleet simulation (scripts/simulate_timelines.py). SYNTHETIC: no real equipment histories exist.
+seed: 42
+start_date: "2024-01-01"
+n_equipment: 30
+n_inspections: [8, 12]                 # uniform integer range per equipment (inclusive)
+first_inspection_day: [0, 30]
+inspection_interval_days: {mean: 55, jitter: 8}   # uniform mean +- jitter
+horizon_days: 728                      # 104 weeks of fleet history (also feeds the demand simulation)
+gt_extra_days: 1825                    # latent process continues (no inspections) to find the true failure day
+
+# Latent defect process per equipment life cycle
+defect_process:
+  emergence_rate_per_day: 0.008        # Poisson rate of new defects (~1 per 125 days); v1 0.006 was too slow, see ISSUES_LOG
+  class_probs: {crack: 0.20, corrosion: 0.30, oil_leak: 0.15, surface_wear: 0.25, damage: 0.10}
+  initial_area: {median: 0.002, log_sigma: 0.6}       # lognormal area ratio at emergence
+  growth_drift_per_day:                # log-area drift (geometric Brownian motion)
+    crack: 0.0085
+    corrosion: 0.0065
+    oil_leak: 0.0070
+    surface_wear: 0.0045
+    damage: 0.0030
+  growth_volatility: 0.02              # std of daily log-area increment
+  frailty_log_sigma: 0.3               # per-equipment lognormal multiplier on emergence rate and drift
+  max_area_ratio: 0.6
+
+# What an inspection "sees" (stand-in for the segmentation model's errors)
+observation:
+  detection_min_area: 0.0005           # smaller defects are missed
+  area_noise_log_sigma: 0.15           # multiplicative mask-area error
+  confidence_beta: [18, 2]             # detector confidence ~ Beta(18, 2), mean 0.9
+
+overhaul:
+  enabled: true
+  observed_health_below: 20            # inspection showing H < 20 -> overhaul, all defects removed, new life cycle
+
+rul:
+  failure_threshold: 20                # true failure = first day true Health (confidence 1) < 20
+  min_inspections_for_fit: 4
+  cap_days: 1825                       # predictions/ground truth beyond this are capped
+  n_sample_curves: 6
